@@ -35,6 +35,8 @@ export default class SearchBar extends Component {
                 }}
                 />
             )}
+            onChange={(e, product) => this.props.setProductId(product ? product.id : null)}
+            disabled={this.props.disabled}
             />
         );
     }
