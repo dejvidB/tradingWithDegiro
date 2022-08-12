@@ -1,48 +1,47 @@
 import { Component } from 'react';
-import Grid from '@mui/material/Grid';
-import TextField from '@mui/material/TextField';
-import Autocomplete from '@mui/material/Autocomplete';
-import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
-import CssBaseline from '@mui/material/CssBaseline';
+import { Grid, Container, CssBaseline, Stack, Button } from '@mui/material/';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import PaidIcon from '@mui/icons-material/Paid';
+import TransactionHistory from '../components/transactionHistory';
+import SearchBar from '../components/searchBar';
 
 export default class HomeComponent extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {}
+        this.state = {
+            orders: [
+                {"id": 1, "symbol": "AAPL", "buy": 2.10, "sell": 2.09, quantity: 450},
+                {"id": 2, "symbol": "META", "buy": 2.10, "sell": 2.50, quantity: 450}
+            ]
+        }
     }
 
     render() {
         return (
             <>
-                <CssBaseline />
-                <Container fixed style={{paddingTop: "25px"}}>
+                <CssBaseline /> 
+                <Container fixed style={{marginTop: "25px"}}>
                     <Grid container spacing={1}>
-                        <Grid item xs={6}>
-                            {/* Buying area */}
-                            <Autocomplete
-                            options={stocks}
-                            autoHighlight
-                            getOptionLabel={(option) => option.name}
-                            renderOption={(props, option) => (
-                                <Box component="li" {...props}>
-                                    {option.name} - {option.symbol}
-                                </Box>
-                            )}
-                            renderInput={(params) => (
-                                <TextField
-                                {...params}
-                                label="Find a stock"
-                                inputProps={{
-                                    ...params.inputProps
-                                }}
-                                />
-                            )}
-                            />
+                        <Grid item xs={6} mt="1%">
+                            <SearchBar/>
+                            <Stack direction="row" spacing={2} mt="30%">
+                                <Button variant="contained"
+                                    color="error" 
+                                    size="large" 
+                                    startIcon={<PaidIcon />}>
+                                    SELL
+                                </Button>
+                                <Button variant="contained"
+                                    color="success" 
+                                    size="large" 
+                                    startIcon={<ShoppingCartIcon/>}>
+                                    BUY
+                                </Button>
+                            </Stack>
                         </Grid>
                         <Grid item xs={6}>
-                            {/* Account data */}
+                            <TransactionHistory orders={this.state.orders}/>
                         </Grid>
                 </Grid>
             </Container>
@@ -50,8 +49,3 @@ export default class HomeComponent extends Component {
         );
     }
 }
-
-const stocks = [
-    {"id": "331868", "name": "Apple Inc",  "symbol": "AAPL"},
-    {"id": "331822", "name": "Meta Inc",  "symbol": "META"}
-];
