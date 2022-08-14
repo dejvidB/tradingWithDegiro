@@ -74,15 +74,30 @@ export default class HomeComponent extends Component {
             });
         }
 
-        this.buy = (productId) => {
-            const newOrder = {"id": 3, "symbol": "NVDA", "buy": 180, "quantity": 10, "sell": null};
-            this.setState(state => ({...state, orderExecution: true}));
-            this.simulateOrder(() => this.setState(state => ({
-                ...state, 
-                orderExecution: false,
-                currentOrder: "buy",
-                productId,
-                orders: [newOrder, ...state.orders]})));
+        this.buy = () => {
+            this.setState(state => ({ ...state, orderExecution: true }),
+                () => this.sendRequest(BUY_ENDPOINT, {
+                    cash: this.state.cash,
+                    cashCurrency: this.state.cashCurrency,
+                    stockId: this.state.productId,
+                    stockCurrency: this.state.productCurrency,
+                    symbol: this.state.productSymbol
+                }, 'POST').then(response => {
+                    const newOrder = {
+                        "id": response.orderId,
+                        "symbol": this.state.productSymbol,
+                        "buy": response.price,
+                        "sell": null,
+                        "quantity": response.quantity
+                    };
+
+                    this.setState(state => ({
+                        ...state,
+                        orderExecution: false,
+                        currentOrder: "buy",
+                        orders: [newOrder, ...state.orders]
+                    }));
+                }));
         }
 
         this.sell = (productId) => {
@@ -135,7 +150,7 @@ export default class HomeComponent extends Component {
                                     size="large" 
                                     startIcon={<ShoppingCartIcon />}
                                     disabled={this.state.productId === null || this.state.orderExecution === true || this.state.currentOrder === "buy"}
-                                    onClick={() => this.buy(1)}>
+                                    onClick={() => this.buy()}>
                                     BUY
                                 </Button>
                             </Stack>
