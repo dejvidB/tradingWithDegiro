@@ -19,6 +19,46 @@ export default class HomeComponent extends Component {
             productId: null
         }
 
+        this.sendRequest = (endpoint, args = {}, method = 'GET') => {
+            let requestOptions = {
+                method: method,
+                headers: {}
+            };
+
+            if (this.state.jsessionid !== null) {
+                requestOptions.headers['jsessionid'] = this.state.jsessionid;
+            }
+
+            if (method.toUpperCase() === 'POST') {
+                requestOptions.headers['Content-Type'] = 'application/json';
+                requestOptions.body = JSON.stringify(args);
+            }
+            else if (method.toUpperCase() === 'GET') {
+                let argsArray = [];
+
+                for (let arg in args) {
+                    argsArray.push(arg + '=' + encodeURIComponent(args[arg]));
+                }
+
+                endpoint += '?' + argsArray.join('&');
+            }
+
+            return new Promise((resolve, reject) => {
+                fetch(endpoint, requestOptions)
+                    .then(response => {
+                        if (!response.ok)
+                            reject(response);
+
+                        this.setState(state => ({ ...state, jsessionid: response.headers.get('jsessionid') }));
+                        return response.json();
+                    })
+                    .then(response => {
+                        resolve(response);
+                    })
+                    .catch(error => reject(error));
+            });
+        }
+
         this.buy = (productId) => {
             const newOrder = {"id": 3, "symbol": "NVDA", "buy": 180, "quantity": 10, "sell": null};
             this.setState(state => ({...state, orderExecution: true}));
