@@ -7,78 +7,72 @@ export default class SearchBar extends Component {
         super(props);
 
         this.state = {
-            stocks: [
-                {"id": "331868", "name": "Apple Inc",  "symbol": "AAPL"},
-                {"id": "331822", "name": "Meta Inc",  "symbol": "META"}
-            ],
+            stocks: [],
             loading: false,
             open: false,
-            noResults: false
+            noResults: false,
+            text: ''
         }
 
         this.search = () => {
-            this.setState(state => ({...state, loading: true, open: true}));
-            this.simulateSearch(results => {
-                this.setState(state => ({
-                    loading: false,
-                    stocks: state.stocks.concat(results.filter(result => state.stocks.map(stock => stock.id).indexOf(result.id) === -1)),
-                    noResults: results.length === 0
+            this.setState(state => ({ ...state, loading: true }),
+                () => this.props.search(this.state.text).then(results => {
+                    this.setState(state => ({
+                        loading: false,
+                        stocks: state.stocks.concat(results.filter(result => state.stocks.map(stock => stock.id).indexOf(result.id) === -1)),
+                        noResults: results.length === 0,
+                        open: true
+                    }));
                 }));
-            });
         }
 
-        this.simulateSearch = fallback => {
-            const results = [
-                {"id": "331869", "name": "Nvidia Inc",  "symbol": "NVDA"}
-            ];
-            setTimeout(() => { fallback(results) }, 1000);
-        }
-
-        this.setOpen = value => this.setState(state => ({...state, open: value}))
+        this.setOpen = value => this.setState(state => ({...state, open: value}));
     }
     
     render(){
         return (
         <>
             <Grid container spacing="2">
-                <Grid item xs="10">
+                <Grid item xs={10}>
                     <Autocomplete
-                    options={this.state.stocks}
-                    open={this.state.open}
-                    onOpen={() => this.setOpen(true)}
-                    onClose={() => this.setOpen(false)}
-                    freeSolo
-                    autoHighlight
-                    getOptionLabel={(option) => option.symbol}
-                    renderOption={(props, option) => (
-                        <Box component="li" {...props}>
-                            {option.name} - {option.symbol}
-                        </Box>
-                    )}
-                    renderInput={(params) => (
-                        <TextField
-                        {...params}
-                        label="Find a stock"
-                        InputProps={{
-                            ...params.InputProps,
-                            endAdornment: (
-                                <>
-                                  {this.state.loading ? <CircularProgress color="success" size={20} /> : null}
-                                  {params.InputProps.endAdornment}
-                                </>
-                            )
-                        }}
-                        />
-                    )}
-                    onChange={(e, product) => this.props.setProductId(product ? product.id : null)}
-                    disabled={this.props.disabled}
+                        options={this.state.stocks}
+                        open={this.state.open}
+                        onOpen={() => this.setOpen(true)}
+                        onClose={() => this.setOpen(false)}
+                        freeSolo
+                        autoHighlight
+                        getOptionLabel={(option) => option.symbol}
+                        renderOption={(props, option) => (
+                            <Box component="li" {...props}>
+                                {option.name} - {option.symbol} @ {option.closePrice}
+                            </Box>
+                        )}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Find a stock"
+                                value={this.state.text}
+                                onChange={(e) => this.setState(state => ({...state, text: e.target.value}))}
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <>
+                                        {this.state.loading ? <CircularProgress color="success" size={20} /> : null}
+                                        {params.InputProps.endAdornment}
+                                        </>
+                                    )
+                                }}
+                            />
+                        )}
+                        onChange={(e, product) => this.props.setProduct(product)}
+                        disabled={this.props.disabled}
                     />
                 </Grid>
-                <Grid item xs="2">
-                    <Button 
-                        size="large" 
-                        variant="outlined" 
-                        style={{minHeight: "100%"}} 
+                <Grid item xs={2}>
+                    <Button
+                        size="large"
+                        variant="outlined"
+                        style={{minHeight: "100%"}}
                         onClick={this.search}
                         disabled={this.props.disabled}>
                         Search
