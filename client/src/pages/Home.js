@@ -128,8 +128,12 @@ export default class HomeComponent extends Component {
             setTimeout(() => { fallback() }, 500);
         }
 
-        this.setProductId = (productId) => {
-            this.setState(state => ({...state, productId}));
+        this.setProduct = (product) => {
+            let productId = product ? product.id : null;
+            let productCurrency = product ? product.currency : null;
+            let productSymbol = product ? product.symbol : null;
+
+            this.setState(state => ({ ...state, productId, productCurrency, productSymbol }));
         }
     }
 
@@ -140,7 +144,7 @@ export default class HomeComponent extends Component {
                 <Container fixed style={{marginTop: "25px"}}>
                     <Grid container spacing={1}>
                         <Grid item xs={6} mt="1%">
-                            <SearchBar setProductId={this.setProductId} disabled={this.state.currentOrder === "buy"}/>
+                        <SearchBar search={text => this.sendRequest(SEARCH_ENDPOINT, { text })} setProduct={this.setProduct} disabled={this.state.currentOrder === "buy"} />
                             <Stack direction="row" spacing={2} mt="30%">
                                 <Button variant="contained"
                                     color="error" 
