@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import { Grid, Container, CssBaseline, Stack, Button } from '@mui/material/';
+import { Grid, Container, CssBaseline, Stack, Button, Alert } from '@mui/material/';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import PaidIcon from '@mui/icons-material/Paid';
 import TransactionHistory from '../components/transactionHistory';
@@ -23,15 +23,14 @@ export default class HomeComponent extends Component {
             productSymbol: null,
             cash: 0,
             cashCurrency: '',
-            jsessionid: null
+            jsessionid: null,
+            error: null
         }
 
         this.componentDidMount = () => {
             this.sendRequest(ACCOUNT_INFO_ENDPOINT).then(response => {
                 this.setState(state => ({ ...state, cash: response[0].value, cashCurrency: response[0].currencyCode }));
-            }, error => {
-                console.log(error);
-            });
+            }, error => {});
         }
 
         this.sendRequest = (endpoint, args = {}, method = 'GET') => {
@@ -61,13 +60,18 @@ export default class HomeComponent extends Component {
             return new Promise((resolve, reject) => {
                 fetch(endpoint, requestOptions)
                     .then(response => {
-                        if (!response.ok)
-                            reject(response);
+                        if (!response.ok) {
+                            return response.json().then(response => {
+                                this.setState(state => ({ ...state, error: response.message }));
+                                throw new Error(response);
+                            });
+                        }
 
                         this.setState(state => ({ ...state, jsessionid: response.headers.get('jsessionid') }));
                         return response.json();
                     })
                     .then(response => {
+                        this.setState(state => ({ ...state, error: null }));
                         resolve(response);
                     })
                     .catch(error => reject(error));
@@ -164,6 +168,9 @@ export default class HomeComponent extends Component {
                             <TransactionHistory orders={this.state.orders} cash={this.state.cash} currency={this.state.cashCurrency} />
                         </Grid>
                     </Grid>
+                    {this.state.error != null && <Alert variant="filled" severity="error" style={{ marginTop: "15px" }}>
+                        {this.state.error}
+                    </Alert>}
                 </Container>
             </>
         );
