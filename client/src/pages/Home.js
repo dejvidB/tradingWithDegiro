@@ -100,23 +100,28 @@ export default class HomeComponent extends Component {
                 }));
         }
 
-        this.sell = (productId) => {
-            this.setState(state => ({...state, orderExecution: true}));
-            this.simulateOrder(() => this.setState(state => ({
-                ...state, 
-                orderExecution: false, 
-                currentOrder: "sell", 
-                productId,
-                orders: [
-                    {
-                        sell: 200,
-                        "id": state.orders[0].id, 
-                        "symbol": state.orders[0].symbol, 
-                        "buy": state.orders[0].buy, 
-                        "quantity": state.orders[0].quantity
-                    }
-                ].concat(state.orders.slice(1))
-            })));
+        this.sell = () => {
+            this.setState(state => ({ ...state, orderExecution: true }),
+                () => this.sendRequest(SELL_ENDPOINT, {
+                    stockId: this.state.productId,
+                    symbol: this.state.productSymbol,
+                    quantity: this.state.orders[0].quantity
+                }, 'POST').then(response => {
+                    this.setState(state => ({
+                        ...state,
+                        orderExecution: false,
+                        currentOrder: "sell",
+                        orders: [
+                            {
+                                "id": response.orderId,
+                                "symbol": state.orders[0].symbol,
+                                "buy": state.orders[0].buy,
+                                "sell": response.price,
+                                "quantity": state.orders[0].quantity
+                            }
+                        ].concat(state.orders.slice(1))
+                    }));
+                }));
         }
 
         this.simulateOrder = fallback => {
@@ -142,7 +147,7 @@ export default class HomeComponent extends Component {
                                     size="large" 
                                     startIcon={<PaidIcon />}
                                     disabled={this.state.productId === null || this.state.orderExecution === true || this.state.currentOrder === "sell"}
-                                    onClick={() => this.sell(1)}>
+                                    onClick={() => this.sell()}>
                                     SELL
                                 </Button>
                                 <Button variant="contained"
