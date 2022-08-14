@@ -5,6 +5,8 @@ import PaidIcon from '@mui/icons-material/Paid';
 import TransactionHistory from '../components/transactionHistory';
 import SearchBar from '../components/searchBar';
 
+const ACCOUNT_INFO_ENDPOINT = '/getAccountInfo';
+
 export default class HomeComponent extends Component {
     constructor(props) {
         super(props);
@@ -16,7 +18,20 @@ export default class HomeComponent extends Component {
             ],
             orderExecution: false,
             currentOrder: "sell",
-            productId: null
+            productId: null,
+            productCurrency: null,
+            productSymbol: null,
+            cash: 0,
+            cashCurrency: '',
+            jsessionid: null
+        }
+
+        this.componentDidMount = () => {
+            this.sendRequest(ACCOUNT_INFO_ENDPOINT).then(response => {
+                this.setState(state => ({ ...state, cash: response[0].value, cashCurrency: response[0].currencyCode }));
+            }, error => {
+                console.log(error);
+            });
         }
 
         this.sendRequest = (endpoint, args = {}, method = 'GET') => {
@@ -126,7 +141,7 @@ export default class HomeComponent extends Component {
                             </Stack>
                         </Grid>
                         <Grid item xs={6}>
-                            <TransactionHistory orders={this.state.orders}/>
+                            <TransactionHistory orders={this.state.orders} cash={this.state.cash} currency={this.state.cashCurrency} />
                         </Grid>
                 </Grid>
             </Container>
