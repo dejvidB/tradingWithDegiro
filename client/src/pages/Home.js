@@ -6,16 +6,16 @@ import TransactionHistory from '../components/transactionHistory';
 import SearchBar from '../components/searchBar';
 
 const ACCOUNT_INFO_ENDPOINT = '/getAccountInfo';
+const SEARCH_ENDPOINT = '/search';
+const BUY_ENDPOINT = '/stocks/buy';
+const SELL_ENDPOINT = '/stocks/sell';
 
 export default class HomeComponent extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            orders: [
-                // {"id": 1, "symbol": "AAPL", "buy": 2.10, "sell": 2.09, quantity: 450},
-                // {"id": 2, "symbol": "META", "buy": 2.10, "sell": 2.50, quantity: 450}
-            ],
+            orders: [],
             orderExecution: false,
             currentOrder: "sell",
             productId: null,
@@ -124,10 +124,6 @@ export default class HomeComponent extends Component {
                 }));
         }
 
-        this.simulateOrder = fallback => {
-            setTimeout(() => { fallback() }, 500);
-        }
-
         this.setProduct = (product) => {
             let productId = product ? product.id : null;
             let productCurrency = product ? product.currency : null;
@@ -140,23 +136,23 @@ export default class HomeComponent extends Component {
     render() {
         return (
             <>
-                <CssBaseline /> 
-                <Container fixed style={{marginTop: "25px"}}>
+                <CssBaseline />
+                <Container fixed style={{ marginTop: "25px" }}>
                     <Grid container spacing={1}>
                         <Grid item xs={6} mt="1%">
-                        <SearchBar search={text => this.sendRequest(SEARCH_ENDPOINT, { text })} setProduct={this.setProduct} disabled={this.state.currentOrder === "buy"} />
+                            <SearchBar search={text => this.sendRequest(SEARCH_ENDPOINT, { text })} setProduct={this.setProduct} disabled={this.state.currentOrder === "buy"} />
                             <Stack direction="row" spacing={2} mt="30%">
                                 <Button variant="contained"
-                                    color="error" 
-                                    size="large" 
+                                    color="error"
+                                    size="large"
                                     startIcon={<PaidIcon />}
                                     disabled={this.state.productId === null || this.state.orderExecution === true || this.state.currentOrder === "sell"}
                                     onClick={() => this.sell()}>
                                     SELL
                                 </Button>
                                 <Button variant="contained"
-                                    color="success" 
-                                    size="large" 
+                                    color="success"
+                                    size="large"
                                     startIcon={<ShoppingCartIcon />}
                                     disabled={this.state.productId === null || this.state.orderExecution === true || this.state.currentOrder === "buy"}
                                     onClick={() => this.buy()}>
@@ -167,9 +163,9 @@ export default class HomeComponent extends Component {
                         <Grid item xs={6}>
                             <TransactionHistory orders={this.state.orders} cash={this.state.cash} currency={this.state.cashCurrency} />
                         </Grid>
-                </Grid>
-            </Container>
-          </>
+                    </Grid>
+                </Container>
+            </>
         );
     }
 }
