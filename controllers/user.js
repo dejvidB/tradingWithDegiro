@@ -4,7 +4,7 @@ class User {
             degiroInstance.getCashFunds().then(cashFunds => {
                 resolve(cashFunds.filter(cash => cash.value > 0));
             }, error => {
-                reject(error);
+                reject(error[0].text);
             });
         });
     }

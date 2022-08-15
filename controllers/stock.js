@@ -19,7 +19,7 @@ class Stock {
                         currency: result.currency,
                         closePrice: result.closePrice
                     })));
-            }).catch(error => reject(error));
+            }).catch(error => reject(error[0].text));
         });
     }
 
@@ -50,8 +50,8 @@ class Stock {
             degiroInstance.createOrder(order).then(({ confirmationId, freeSpaceNew, transactionFees }) => {
                 degiroInstance.executeOrder(order, confirmationId).then(orderId => {
                     resolve(orderId);
-                })
-            }).catch(error => reject(error));
+                }).catch(error => reject(error[0].text));
+            }).catch(error => reject(error[0].text));
         });
     }
 
@@ -69,8 +69,8 @@ class Stock {
             degiroInstance.createOrder(order).then(({ confirmationId, freeSpaceNew, transactionFees }) => {
                 degiroInstance.executeOrder(order, confirmationId).then(orderId => {
                     resolve(orderId);
-                })
-            }).catch(error => reject(error));
+                }).catch(error => reject(error[0].text));
+            }).catch(error => reject(error[0].text));
         });
     }
 }

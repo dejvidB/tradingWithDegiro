@@ -31,7 +31,7 @@ export default class TransactionHistory extends Component {
                                     </ListItemIcon>
                                     <ListItemText
                                         primary={order.symbol}
-                                        secondary={order.quantity + " @ " + order.buy.toFixed(2)} />
+                                        secondary={order.quantity + " @ " + order.buy} />
                                 </ListItem>
                         );
                     })}

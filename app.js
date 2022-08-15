@@ -29,8 +29,13 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  console.log(err);
   res.status(err.status || 500);
-  res.json({ err });
+  res.json({ 'message': err });
 });
 
 module.exports = app;

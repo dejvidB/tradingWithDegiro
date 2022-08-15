@@ -5,7 +5,6 @@ class Util{
                 resolve(amount);
 
             if (process.env[from.toUpperCase() + "_TO_" + to.toUpperCase()]) {
-                console.log("from .env", parseFloat(process.env[from.toUpperCase() + "_TO_" + to.toUpperCase()]));
                 resolve(amount * parseFloat(process.env[from.toUpperCase() + "_TO_" + to.toUpperCase()]));
             }
 
