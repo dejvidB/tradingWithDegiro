@@ -33,7 +33,7 @@ class Stock {
     }
 
     static calculateTradeSize = (cash, stockPrice) => {
-        return Math.floor((cash - process.env.DEGIRO_TRANSACTION_FEES) / stockPrice);
+        return Math.floor(cash / stockPrice);
     }
 
     static buy = (degiroInstance, productId, price, size) => {
